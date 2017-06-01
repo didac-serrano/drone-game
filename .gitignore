@@ -1,7 +1,14 @@
 VS2015\Debug*
 VS2015\Release*
-!*.sln
-!*.vcxproj
+
+# Visual studio #
+#################
+*.iobj
+*.pdb
+*.ipdb 
+*.db
+*.aps
+*.rc
 
 # Compiled source #
 ###################
@@ -13,10 +20,6 @@ VS2015\Release*
 *.so
 *.pyc
 *.obj
-
-# Xbox controller stuff #
-#########################
-!*x360c3.exe
 
 # Packages #
 ############
