@@ -1,0 +1,96 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="..\..\src\camera.cpp" />
+    <ClCompile Include="..\..\src\entity.cpp" />
+    <ClCompile Include="..\..\src\extra\textparser.cpp" />
+    <ClCompile Include="..\..\src\framework.cpp" />
+    <ClCompile Include="..\..\src\game.cpp" />
+    <ClCompile Include="..\..\src\level.cpp" />
+    <ClCompile Include="..\..\src\main.cpp" />
+    <ClCompile Include="..\..\src\mesh.cpp" />
+    <ClCompile Include="..\..\src\meshmanager.cpp" />
+    <ClCompile Include="..\..\src\playercontroller.cpp" />
+    <ClCompile Include="..\..\src\rendertotexture.cpp" />
+    <ClCompile Include="..\..\src\shader.cpp" />
+    <ClCompile Include="..\..\src\texture.cpp" />
+    <ClCompile Include="..\..\src\texturemanager.cpp" />
+    <ClCompile Include="..\..\src\utils.cpp" />
+    <ClCompile Include="..\..\src\menu.cpp" />
+    <ClCompile Include="..\..\src\menu.h" />
+    <ClCompile Include="..\..\src\extra\coldet\box.cpp">
+      <Filter>Coldet</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\extra\coldet\box_bld.cpp">
+      <Filter>Coldet</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\extra\coldet\coldet.cpp">
+      <Filter>Coldet</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\extra\coldet\coldet_bld.cpp">
+      <Filter>Coldet</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\extra\coldet\math3d.cpp">
+      <Filter>Coldet</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\extra\coldet\mytritri.cpp">
+      <Filter>Coldet</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\extra\coldet\sysdep.cpp">
+      <Filter>Coldet</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\extra\coldet\tritri.c">
+      <Filter>Coldet</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\src\bulletmanager.cpp" />
+    <ClCompile Include="..\..\src\checkcollisions.cpp" />
+    <ClCompile Include="..\..\src\IA.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\src\camera.h" />
+    <ClInclude Include="..\..\src\entity.h" />
+    <ClInclude Include="..\..\src\extra\textparser.h" />
+    <ClInclude Include="..\..\src\framework.h" />
+    <ClInclude Include="..\..\src\game.h" />
+    <ClInclude Include="..\..\src\includes.h" />
+    <ClInclude Include="..\..\src\level.h" />
+    <ClInclude Include="..\..\src\mesh.h" />
+    <ClInclude Include="..\..\src\meshmanager.h" />
+    <ClInclude Include="..\..\src\playercontroller.h" />
+    <ClInclude Include="..\..\src\rendertotexture.h" />
+    <ClInclude Include="..\..\src\shader.h" />
+    <ClInclude Include="..\..\src\texture.h" />
+    <ClInclude Include="..\..\src\texturemanager.h" />
+    <ClInclude Include="..\..\src\utils.h" />
+    <ClInclude Include="resource.h" />
+    <ClInclude Include="..\..\src\extra\coldet\box.h">
+      <Filter>Coldet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\extra\coldet\coldet.h">
+      <Filter>Coldet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\extra\coldet\coldetimpl.h">
+      <Filter>Coldet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\extra\coldet\math3d.h">
+      <Filter>Coldet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\extra\coldet\mytritri.h">
+      <Filter>Coldet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\extra\coldet\sysdep.h">
+      <Filter>Coldet</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\src\bulletmanager.h" />
+    <ClInclude Include="..\..\src\checkcollisions.h" />
+    <ClInclude Include="..\..\src\IA.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="visualstudio.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="Coldet">
+      <UniqueIdentifier>{6c4ab77c-0645-4d9e-ac5f-4f84d9add172}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
