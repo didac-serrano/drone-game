@@ -1,0 +1,8 @@
+1) onCollision() -> totes les entities falten
+2) funcionament IA drone
+2b) mapa -> way points IA drone en depenen
+3) visibilitat IA -> no disparar si entre target i entity hi ha obstacles
+4) reestructura de codi amb els Stages
+5) menus
+6) visualització pantalla HP
+sons / musica ?
