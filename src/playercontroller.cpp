@@ -54,7 +54,7 @@ void PlayerController::update(double seconds_elapsed) {
 	float factor = 0.5;
 	Matrix44 entityMatrix = playerEntity->getGlobalMatrix();
 
-	Vector3 cameraMatrixEye = entityMatrix * Vector3(0, 20, -60); //p38
+	Vector3 cameraMatrixEye = entityMatrix * Vector3(0, 20, -60);
 	cameraMatrixEye = mix( cameraMatrixEye, camera->eye, factor);
 	Vector3 cameraMatrixCenter = entityMatrix * Vector3(0, 0, 100);
 	cameraMatrixCenter = mix(cameraMatrixCenter, camera->center, factor);

@@ -92,6 +92,7 @@ public:
 	~EntityCollider();
 
 	virtual void onCollision();
+	virtual void onDynamicCollision(EntityCollider* colliderEntity);
 	void setDynamic();
 	void setStatic();
 };
@@ -102,9 +103,9 @@ public:
 	float bulletTime;
 	float bulletCooldown;
 	int healthPoints;
-	int detectionRange; //Se utilitza a IA pero es un atribut independent de cada entitat
+	int detectionRange;
+	//Se utilitza a IA pero es un atribut independent de cada entitat
 	Vector3 targetPosition;
-
 
 	EntityShooter();
 	~EntityShooter();
@@ -120,7 +121,9 @@ public:
 	~Drone();
 	void update(float dt);
 	void shoot();
-	void onCollision(); //Hereda de EntityCollider, perd healthPoints o el que sigui
+	void onCollision();
+	void onDynamicCollision(EntityCollider* colliderEntity); 
+	//Hereda de EntityCollider, perd healthPoints o el que sigui
 };
 
 class Turret : public EntityShooter //Shooter
@@ -132,9 +135,12 @@ public:
 
 	void update(float dt);
 	void shoot();
-	void onCollision(); //Hereda de EntityCollider, perd healthPoints o el que sigui
+	void onCollision();
+	void onDynamicCollision(EntityCollider* colliderEntity);
+	//Hereda de EntityCollider, perd healthPoints o el que sigui
 };
 
+/*
 class Detector : public EntityCollider //Collider (no dispara)
 {
 public:
@@ -143,5 +149,5 @@ public:
 	void update(float dt);
 	void onCollision(); //Hereda de EntityCollider, perd healthPoints o el que sigui
 };
-
+*/
 #endif // !ENTITY_H

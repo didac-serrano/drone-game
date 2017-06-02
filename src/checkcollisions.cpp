@@ -42,7 +42,7 @@ void CheckCollisions::staticToDynamic(){
 			if (first_collision_model->collision(second_collision_model, -1, 0, secondEntity->getGlobalMatrix().m) == false)
 				continue;
 
-			std::cout << "Collision staticToDynamic" << std::endl;
+			//std::cout << "Collision staticToDynamic" << std::endl;
 
 			firstEntity->onCollision();
 			secondEntity->onCollision();
@@ -75,8 +75,8 @@ void CheckCollisions::dynamicToDynamic() {
 
 			std::cout << "Collision dynamicToDynamic" << std::endl;
 
-			firstEntity->onCollision();
-			secondEntity->onCollision();
+			firstEntity->onDynamicCollision(secondEntity);
+			secondEntity->onDynamicCollision(firstEntity);
 
 		}
 	}
@@ -104,7 +104,7 @@ void CheckCollisions::bulletToStatic() {
 			if (collision_model->rayCollision(start.v, front.v, true, 0.0, 10.0) == false)
 				continue;
 
-			std::cout << "Collision bulletToStatic" << std::endl;
+			//std::cout << "Collision bulletToStatic" << std::endl;
 
 			bullet.ttl = 0.0001;
 			actualEntity->onCollision();
@@ -154,7 +154,7 @@ void CheckCollisions::bulletToDynamic() {
 			if (collision_model->rayCollision(start.v, front.v, true, 0.0, 10.0) == false)
 				continue;
 
-			std::cout << "Collision bulletToDynamic" << std::endl;
+			//std::cout << "Collision bulletToDynamic" << std::endl;
 
 			bullet.ttl = 0.0001;
 			actualEntity->onCollision();

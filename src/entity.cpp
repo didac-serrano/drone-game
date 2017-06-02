@@ -65,6 +65,7 @@ Vector3 Entity::getGlobalPosition() {
 	return getGlobalMatrix() * Vector3();
 }
 
+//carregar-se la funció i fer el .frontVector() des d'on el necessiti
 Vector3 Entity::getFront() {
 	return getGlobalMatrix().frontVector();
 }
@@ -120,6 +121,18 @@ void EntityMesh::render(Camera* camera)
 
 		shader->disable();
 
+		//Debugging purposes
+		Mesh front;
+		front.vertices.push_back(getGlobalPosition());
+		Vector3 frontVector = getGlobalMatrix().frontVector()*float(30.0);
+		Vector3 farPoint = frontVector + getGlobalPosition();
+		front.vertices.push_back(farPoint);
+		//std::cout << frontVector.x << " " << frontVector.y << " " << frontVector.z << "\n";
+		if (front.vertices.size() > 0) {
+			glLineWidth(4);
+			front.render(GL_LINES);
+		}
+
 		for (int i = 0; i < children.size(); i++) {
 			children[i]->render(camera);
 		}
@@ -140,6 +153,10 @@ void EntityCollider::onCollision() {
 		removeChild(children[i]);
 	}
 	*/
+}
+
+void EntityCollider::onDynamicCollision(EntityCollider* colliderEntity) {
+
 }
 
 void EntityCollider::setDynamic()
@@ -183,8 +200,17 @@ void Drone::shoot() {
 		bulletTime = bulletCooldown;
 	}
 }
+
 void Drone::onCollision() {
 
+}
+
+void Drone::onDynamicCollision(EntityCollider* colliderEntity) {
+	//agenjo "buscar física de particulas básica"
+	healthPoints -= 1;
+	Vector3 front = getFront();
+	model.traslateLocal(-front.x, -front.y, -front.z);
+	//Vector3 colliderFront = colliderEntity->getFront();
 }
 
 
@@ -221,6 +247,15 @@ void Turret::shoot()
 
 void Turret::onCollision() {
 
+}
+
+void Turret::onDynamicCollision(EntityCollider* colliderEntity) {
+	//agenjo "buscar física de particulas básica"
+	healthPoints -= 2;
+	Vector3 front = getFront();
+	//La torreta no es mou del seu terra
+	model.traslate(-float(12)*front.x, 0.0, -float(12)*front.z);
+	//Vector3 colliderFront = colliderEntity->getFront();
 }
 
 /*

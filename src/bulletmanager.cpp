@@ -23,7 +23,7 @@ BulletManager::BulletManager() {
 BulletManager::~BulletManager() {}
 
 void BulletManager::render(Camera* camera) {
-	Mesh bulletMesh = Mesh();
+	Mesh bulletMesh;
 
 	for (int i = 0; i < NUMBULLETS; i++) {
 		Bullet& bullet = myBManager->bullets[i];

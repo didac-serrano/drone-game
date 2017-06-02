@@ -31,7 +31,8 @@ public:
 	IA();
 	~IA();
 
-	double lastAngle;
+	double angle;
+	double angleDif;
 
 	Entity* target;
 	bool targetDetected;

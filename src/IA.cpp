@@ -10,14 +10,15 @@
 
 
 //IA
-IA::IA() {
-	lastAngle = 0.0;
-}
+IA::IA() {}
 IA::~IA() {}
 
 
 // IA_Turret
-IA_Turret::IA_Turret() {};
+IA_Turret::IA_Turret() {
+	angle = 0.0;
+	angleDif = 0.0;
+};
 IA_Turret::~IA_Turret() {};
 
 void IA_Turret::update(double seconds_elapsed)
@@ -41,34 +42,47 @@ bool IA_Turret::scanEnemies()
 void IA_Turret::rotate(double seconds_elapsed)
 {
 	Vector3 direction = (target->getGlobalPosition() - controlledEntity->getGlobalPosition()).normalize();
-	Vector3 entityFront = controlledEntity->getFront().normalize();
+	Vector3 entityFront = controlledEntity->getFront();
 
 	//Necessitem que no tingui en compte la diferencia d'alçada, ja que només rota en un pla
 	//Per això passem de les Y, sinó rota encara que estigui alineada amb el target (però en diferent alçada)
 	double dot = (direction.x * entityFront.x) + (direction.z * entityFront.z);
 	double cross = (direction.x * entityFront.z) - (direction.z * entityFront.x);
-	double angle = acos(dot);
+	angle = acos(dot);
 
 	//Evitem soroll en el calcul d'angles
 	//Aka sense moure el target es movia la torreta
-	double angleDif = abs(angle - lastAngle);
+	//std::cout << angle << "\n";
 
 	//Es torreta, rota sobre el seu eix Y ja que està ancorada a una base
-	if (angleDif > 0.01)
+	if (angle)
 	{
-		if (cross > 0.2) {
-			controlledEntity->model.rotateLocal(-seconds_elapsed * angle * 2, controlledEntity->getTop());
+		if (angle < 0.095) {
+			std::cout << "1" << "\n";
+			if (cross > 0.2) {
+				controlledEntity->model.rotateLocal(-angle, controlledEntity->getTop());
+			}
+			else if (cross < 0.2) {
+				controlledEntity->model.rotateLocal(angle, controlledEntity->getTop());
+			}
 		}
-		else if (cross < 0.2) {
-			controlledEntity->model.rotateLocal(seconds_elapsed * angle * 2, controlledEntity->getTop());
+
+		else {
+			std::cout << "2" << "\n";
+			if (cross > 0.2) {
+				controlledEntity->model.rotateLocal(-seconds_elapsed * angle, controlledEntity->getTop());
+			}
+			else if (cross < 0.2) {
+				controlledEntity->model.rotateLocal(seconds_elapsed * angle, controlledEntity->getTop());
+			}
 		}
 	}
-	lastAngle = angle;
 }
 
 void IA_Turret::shootAtEnemies()
 {
-	controlledEntity->shoot();
+	if(angle < 0.002)
+		controlledEntity->shoot();
 }
 
 void IA_Turret::warn()
@@ -84,14 +98,6 @@ void IA_Turret::makeSound()
 {
 	std::cout << "Piiiii" << std::endl;
 }
-
-
-
-
-
-
-
-
 
 //IA_Drone
 IA_Drone::IA_Drone() {}
