@@ -16,6 +16,7 @@ public:
 	Drone* playerEntity;
 	SDL_Joystick* myJoystick;
 	Camera* camera;
+	Vector3 inercia;
 
 	PlayerController();
 	~PlayerController();

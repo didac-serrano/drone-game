@@ -26,7 +26,7 @@ Texture* TextureManager::getTexture(const char* filename) {
 	Texture* texture = NULL;
 	texture = new Texture();
 	if (!texture->load(filename) ) {
-		std::cout << "Texture not found or error" << std::endl;
+		std::cout << "Texture not found or error: " << filename << std::endl;
 		exit(0);
 	}
 

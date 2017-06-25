@@ -87,11 +87,13 @@ class EntityCollider : public EntityMesh
 public:
 	static std::vector<EntityCollider*> dynamicColliders;
 	static std::vector<EntityCollider*> staticColliders;
+	float stunned;
 
 	EntityCollider();
 	~EntityCollider();
 
-	virtual void onCollision();
+	virtual void onBulletCollision();
+	virtual void onStaticCollision();
 	virtual void onDynamicCollision(EntityCollider* colliderEntity);
 	void setDynamic();
 	void setStatic();
@@ -116,12 +118,17 @@ public:
 class Drone : public EntityShooter //Shooter
 {
 public: 
+	Vector3 lastPos;
+	int lastPosCd;
+
 	Drone();
 	Drone(float seconds);
 	~Drone();
+	
 	void update(float dt);
 	void shoot();
-	void onCollision();
+	void onBulletCollision();
+	void onStaticCollision();
 	void onDynamicCollision(EntityCollider* colliderEntity); 
 	//Hereda de EntityCollider, perd healthPoints o el que sigui
 };

@@ -124,7 +124,7 @@ void EntityMesh::render(Camera* camera)
 		//Debugging purposes
 		Mesh front;
 		front.vertices.push_back(getGlobalPosition());
-		Vector3 frontVector = getGlobalMatrix().frontVector()*float(30.0);
+		Vector3 frontVector = getGlobalMatrix().frontVector() * float(30.0);
 		Vector3 farPoint = frontVector + getGlobalPosition();
 		front.vertices.push_back(farPoint);
 		//std::cout << frontVector.x << " " << frontVector.y << " " << frontVector.z << "\n";
@@ -147,17 +147,11 @@ std::vector<EntityCollider*> EntityCollider::staticColliders;
 EntityCollider::EntityCollider() {}
 EntityCollider::~EntityCollider() {}
 
-void EntityCollider::onCollision() {
-	/*
-	for (int i = 0; i < children.size(); i++) {
-		removeChild(children[i]);
-	}
-	*/
-}
+void EntityCollider::onBulletCollision() {}
 
-void EntityCollider::onDynamicCollision(EntityCollider* colliderEntity) {
+void EntityCollider::onStaticCollision() {}
 
-}
+void EntityCollider::onDynamicCollision(EntityCollider* colliderEntity) {}
 
 void EntityCollider::setDynamic()
 {
@@ -179,37 +173,61 @@ EntityShooter::~EntityShooter() {};
 Drone::Drone() {
 	bulletCooldown = 2.0;
 	bulletTime = 2.0;
+	lastPosCd = .5;
+	lastPos = { 0, 0, 0 };
+	stunned = 0.0;
 }
 
 Drone::Drone(float seconds) {
 	bulletCooldown = seconds;
 	bulletTime = seconds;
+	lastPosCd = .125;
+	lastPos = { 0, 0, 0 };
+	stunned = 0.0;
 }
 
 Drone::~Drone() {};
 
 void Drone::update(float dt) {
 	bulletTime -= dt;
+	lastPosCd -= dt;
+	if (stunned > 0.0)
+		stunned -= dt;
+	if (lastPosCd <= 0) {
+		lastPos = getGlobalPosition();
+		lastPosCd = .125;
+	}
 }
 
 void Drone::shoot() {
 
 	if (bulletTime <= 0) {
-		BulletManager::getInstance()->createBullet(getPosition(),
-			(getGlobalMatrix() * Vector3(0, 0, 1) - getPosition()).normalize() * 400, id, 2, Vector3(0.0, 0.0, 1.0));
+		BulletManager::getInstance()->createBullet(getGlobalPosition(),
+			(getGlobalMatrix() * Vector3(0, 0, 1) - getGlobalPosition()).normalize() * 400, id, 2, Vector3(0.0, 0.0, 1.0));
 		bulletTime = bulletCooldown;
 	}
 }
 
-void Drone::onCollision() {
+void Drone::onBulletCollision() {
+	healthPoints -= 5;
+}
 
+void Drone::onStaticCollision() {
+	healthPoints -= 5;
+	Vector3 dir = ((getPosition() * 1000000000.0) - (lastPos * 1000000000.0));
+	std::cout << -dir.x << ", " << -dir.y << ", " << -dir.z << std::endl;
+	dir.normalize();
+	dir = dir * 15;
+	model.traslateLocal(-dir.x, -dir.y, -dir.z);
+	std::cout << -dir.x << ", " << -dir.y << ", " << -dir.z << std::endl;
+	std::cout << "--------" << std::endl;
 }
 
 void Drone::onDynamicCollision(EntityCollider* colliderEntity) {
 	//agenjo "buscar física de particulas básica"
 	healthPoints -= 1;
-	Vector3 front = getFront();
-	model.traslateLocal(-front.x, -front.y, -front.z);
+	Vector3 dir = (getGlobalPosition() - lastPos).normalize() * 200;
+	model.traslateLocal(-dir.x, -dir.y, -dir.z);
 	//Vector3 colliderFront = colliderEntity->getFront();
 }
 
@@ -254,7 +272,7 @@ void Turret::onDynamicCollision(EntityCollider* colliderEntity) {
 	healthPoints -= 2;
 	Vector3 front = getFront();
 	//La torreta no es mou del seu terra
-	model.traslate(-float(12)*front.x, 0.0, -float(12)*front.z);
+	model.traslate(-float(12) * front.x, 0.0, -float(12) * front.z);
 	//Vector3 colliderFront = colliderEntity->getFront();
 }
 

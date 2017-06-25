@@ -23,6 +23,7 @@ bool Level::loadLevel(Entity* root, PlayerController* controller, IA_Manager* mo
 	t.seek("*PLAYERENTITY");
 	std::string playerString = t.getword();
 	Drone* player = new Drone();
+	player->healthPoints = 100;
 	player->name = playerString;
 	player->meshName = playerString;
 	player->textureNames.push_back(playerString);
@@ -170,7 +171,7 @@ bool Level::loadLevel(Entity* root, PlayerController* controller, IA_Manager* mo
 		t.seek("*SCALE");
 		Vector3* mapScale = new Vector3;
 		mapScale->x = t.getfloat();
-		mapScale->y = t.getfloat();
+		mapScale->y = t.getfloat();sss
 		mapScale->z = t.getfloat();
 		*/
 		t.seek("*TRASLATE");

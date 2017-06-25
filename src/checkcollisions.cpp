@@ -44,8 +44,9 @@ void CheckCollisions::staticToDynamic(){
 
 			//std::cout << "Collision staticToDynamic" << std::endl;
 
-			firstEntity->onCollision();
-			secondEntity->onCollision();
+			//firstEntity->onCollision();
+			secondEntity->onStaticCollision();
+			secondEntity->stunned = 1.0;
 
 		}
 	}
@@ -73,7 +74,7 @@ void CheckCollisions::dynamicToDynamic() {
 			if (first_collision_model->collision(second_collision_model, -1, 0, secondEntity->getGlobalMatrix().m) == false)
 				continue;
 
-			std::cout << "Collision dynamicToDynamic" << std::endl;
+			//std::cout << "Collision dynamicToDynamic" << std::endl;
 
 			firstEntity->onDynamicCollision(secondEntity);
 			secondEntity->onDynamicCollision(firstEntity);
@@ -107,7 +108,9 @@ void CheckCollisions::bulletToStatic() {
 			//std::cout << "Collision bulletToStatic" << std::endl;
 
 			bullet.ttl = 0.0001;
-			actualEntity->onCollision();
+			//De moment no hi ha cap entitat estàtica matable
+			//actualEntity->onCollision();
+			
 			//std::cout << "Colision" << std::endl;
 			
 			/* //Collision test OK it works
@@ -157,7 +160,7 @@ void CheckCollisions::bulletToDynamic() {
 			//std::cout << "Collision bulletToDynamic" << std::endl;
 
 			bullet.ttl = 0.0001;
-			actualEntity->onCollision();
+			actualEntity->onBulletCollision();
 		
 		}
 	}

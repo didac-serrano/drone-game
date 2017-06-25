@@ -106,7 +106,7 @@ void Game::init(void)
 	cameraMode = false;
 }
 
-//what to do when the image has to be draw
+//what to do when the image has to be drawn
 void Game::render(void)
 {
 	glClearColor(1.0, 0.0, 0.0, 1.0);
