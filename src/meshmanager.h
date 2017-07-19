@@ -1,5 +1,5 @@
 /*
-	Manager de meshes.
+	Singleton para el manager de meshes.
 
 	Dídac Serrano TJE 2017
 */
@@ -12,7 +12,7 @@
 #include <string>
 #include <map>
 
-class MeshManager{
+class MeshManager {
 
 public:
 	static MeshManager* myManager;
@@ -21,7 +21,6 @@ public:
 	~MeshManager();
 	static Mesh* getMesh(const char* filename);
 	static MeshManager* getInstance();
-
 };
 
 

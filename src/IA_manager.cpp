@@ -7,27 +7,32 @@
 #include "IA.h"
 #include "checkcollisions.h"
 
-
-// IA Controller
 IA_Manager::IA_Manager() {};
-
 IA_Manager::~IA_Manager() {};
 
-/*
-void IA_Manager::addLockerEntity(IA_Locker* newLocker)
-{
-	lockerIAs.push_back(newLocker);
-} */
+IA_Manager* IA_Manager::myIAManager = 0;
 
-void IA_Manager::addStaticEntity(IA_Turret* newDetector)
+void IA_Manager::addStaticEntity(IA_Turret* newTurret)
 {
-	staticIAs.push_back(newDetector);
+	staticIAs.push_back(newTurret);
 }
 
 void IA_Manager::addDynamicEntity(IA_Drone* newDrone)
 {
 	dynamicIAs.push_back(newDrone);
 }
+
+void IA_Manager::deleteStaticEntity(IA_Turret* turret)
+{
+	auto it = std::find(staticIAs.begin(), staticIAs.end(), turret);
+	if (it == staticIAs.end())
+	{
+		std::cout << "Some real bad happened" << std::endl;
+		return;
+	}
+	staticIAs.erase(it);
+}
+
 
 void IA_Manager::update(double seconds_elapsed)
 {
@@ -61,4 +66,10 @@ void IA_Manager::warnAll(Vector3 lastSeenEnemy)
 	}
 }
 
+IA_Manager* IA_Manager::getInstance() {
+	if (myIAManager == 0)
+		myIAManager = new IA_Manager();
+
+	return myIAManager;
+}
 #endif // !IA_MANAGER_CPP

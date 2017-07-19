@@ -55,14 +55,11 @@ void Game::init(void)
 	glEnable( GL_CULL_FACE ); //render both sides of every triangle
 	glEnable( GL_DEPTH_TEST ); //check the occlusions using the Z buffer
 	
-	//Joystick
+	//Joystick - no es singleton per si toca fer multiplayer
 	SDL_Joystick* myJoystick = NULL;
 	myJoystick = openJoystick(0);
 	controller = new PlayerController();
 	controller->myJoystick = myJoystick;
-
-	//IA_manager
-	motherIA = new IA_Manager();
 
 	//create our cameras
 	gameCamera = new Camera();
@@ -80,7 +77,7 @@ void Game::init(void)
 	root = new Entity();
 	Level* level = new Level();
 	const char* levelFile = "level1.txt";
-	if (!level->loadLevel(root, controller, motherIA, levelFile))
+	if (!level->loadLevel(root, controller, IA_Manager::getInstance(), levelFile))
 		std::cout << "Failed to load level" << levelFile << std::endl;
 
 	cielo = new EntityMesh();
@@ -132,7 +129,7 @@ void Game::render(void)
 	cielo->render(currentCamera);
 	glEnable(GL_DEPTH_TEST);
 	root->render(currentCamera);
-
+	
 	BulletManager::getInstance()->render(currentCamera);
 	/*else //render using fixed pipeline (DEPRECATED, use for debug only)
 	{
@@ -145,7 +142,11 @@ void Game::render(void)
     glDisable( GL_BLEND );
 
 	//example to render the FPS every 10 frames
-	//drawText(2,2, std::to_string(fps), Vector3(1,1,1), 2 );
+	drawText(2, 2, std::to_string(fps), Vector3(1, 1, 1), 2 );
+	std::string coordinates = std::to_string(root->children[0]->getPosition().x) + 
+		" " + std::to_string(root->children[0]->getPosition().y) + 
+		" " + std::to_string(root->children[0]->getPosition().z);
+	drawText(2, 22, (coordinates), Vector3(1, 1, 1), 2);
 
 	//swap between front buffer and back buffer
 	SDL_GL_SwapWindow(this->window);
@@ -189,7 +190,7 @@ void Game::update(double seconds_elapsed)
 		CheckCollisions::getInstance()->checkAll();
 		root->update(seconds_elapsed);
 		controller->update(seconds_elapsed);
-		motherIA->update(seconds_elapsed);
+		IA_Manager::getInstance()->update(seconds_elapsed);
 	}
 
 	

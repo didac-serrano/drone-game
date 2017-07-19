@@ -37,7 +37,8 @@ void BulletManager::render(Camera* camera) {
 
 	if (bulletMesh.vertices.size() > 0) {
 		glLineWidth(2);
-		glEnable(GL_BLEND); 
+		glEnable(GL_BLEND);
+		glLineWidth(4);
 		bulletMesh.render(GL_LINES);
 		glDisable(GL_BLEND);
 	}

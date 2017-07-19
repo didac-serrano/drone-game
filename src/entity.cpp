@@ -5,6 +5,7 @@
 #include "meshmanager.h"
 #include "texturemanager.h"
 #include "bulletmanager.h"
+#include "utils.h"
 
 // Entity
 unsigned Entity::idCounter = 0;
@@ -58,24 +59,8 @@ Matrix44 Entity::getGlobalMatrix()
 }
 
 Vector3 Entity::getPosition() {
-	return model * Vector3();
-}
-
-Vector3 Entity::getGlobalPosition() {
 	return getGlobalMatrix() * Vector3();
 }
-
-//carregar-se la funció i fer el .frontVector() des d'on el necessiti
-Vector3 Entity::getFront() {
-	return getGlobalMatrix().frontVector();
-}
-
-Vector3 Entity::getTop() {
-	return getGlobalMatrix().topVector();
-}
-
-
-
 
 
 
@@ -123,15 +108,16 @@ void EntityMesh::render(Camera* camera)
 
 		//Debugging purposes
 		Mesh front;
-		front.vertices.push_back(getGlobalPosition());
+		front.vertices.push_back(getPosition());
 		Vector3 frontVector = getGlobalMatrix().frontVector() * float(30.0);
-		Vector3 farPoint = frontVector + getGlobalPosition();
+		Vector3 farPoint = frontVector + getPosition();
 		front.vertices.push_back(farPoint);
 		//std::cout << frontVector.x << " " << frontVector.y << " " << frontVector.z << "\n";
 		if (front.vertices.size() > 0) {
 			glLineWidth(4);
 			front.render(GL_LINES);
 		}
+		//-------
 
 		for (int i = 0; i < children.size(); i++) {
 			children[i]->render(camera);
@@ -149,7 +135,7 @@ EntityCollider::~EntityCollider() {}
 
 void EntityCollider::onBulletCollision() {}
 
-void EntityCollider::onStaticCollision() {}
+void EntityCollider::onStaticCollision(Vector3 collisionPoint) {}
 
 void EntityCollider::onDynamicCollision(EntityCollider* colliderEntity) {}
 
@@ -167,22 +153,97 @@ void EntityCollider::setStatic()
 //EntityShooter
 EntityShooter::EntityShooter() {};
 EntityShooter::~EntityShooter() {};
+void EntityShooter::render(Camera* camera)
+{
+	Mesh* mesh = MeshManager::getMesh(meshName.c_str());
+	Texture* texture;
+
+	Vector3 actualCenter = getGlobalMatrix()*mesh->center;
+
+	if (!clip || camera->testSphereInFrustum(actualCenter, mesh->halfSize.length())) {
+
+		if (!shader) shader = default_shader;
+
+		if (hitCooldown > 0.0)
+		{
+			hit_shader->enable();
+			hit_shader->setMatrix44("u_model", model);
+			Matrix44 mvp = model * camera->viewprojection_matrix;
+			hit_shader->setMatrix44("u_mvp", mvp);
+
+			if (textureNames.size() == 1) {
+				texture = TextureManager::getTexture((textureNames[0] + ".tga").c_str());
+				hit_shader->setTexture("u_texture", texture);
+				mesh->render(GL_TRIANGLES, shader);
+			}
+
+			else {
+				for (int i = 0; i < textureNames.size(); i++) {
+					//std::cout << textureNames[i] << std::endl;
+					texture = TextureManager::getTexture((textureNames[i] + ".tga").c_str());
+					hit_shader->setTexture(textureNames[i].c_str(), texture);
+					mesh->render(GL_TRIANGLES, shader);
+				}
+			}
+
+			shader->disable();
+		}
+		else
+		{
+			shader->enable();
+			shader->setMatrix44("u_model", model);
+			Matrix44 mvp = model * camera->viewprojection_matrix;
+			shader->setMatrix44("u_mvp", mvp);
+
+			if (textureNames.size() == 1) {
+				texture = TextureManager::getTexture((textureNames[0] + ".tga").c_str());
+				shader->setTexture("u_texture", texture);
+				mesh->render(GL_TRIANGLES, shader);
+			}
+
+			else {
+				for (int i = 0; i < textureNames.size(); i++) {
+					//std::cout << textureNames[i] << std::endl;
+					texture = TextureManager::getTexture((textureNames[i] + ".tga").c_str());
+					shader->setTexture(textureNames[i].c_str(), texture);
+					mesh->render(GL_TRIANGLES, shader);
+				}
+			}
+
+			shader->disable();
+		}
+
+		//Debugging purposes
+		Mesh front;
+		front.vertices.push_back(getPosition());
+		Vector3 frontVector = getGlobalMatrix().frontVector() * float(30.0);
+		Vector3 farPoint = frontVector + getPosition();
+		front.vertices.push_back(farPoint);
+		//std::cout << frontVector.x << " " << frontVector.y << " " << frontVector.z << "\n";
+		if (front.vertices.size() > 0) {
+			glLineWidth(4);
+			front.render(GL_LINES);
+		}
+		//-------
+
+		for (int i = 0; i < children.size(); i++) {
+			children[i]->render(camera);
+		}
+	}
+}
 
 
 //Drone
 Drone::Drone() {
+	hitCooldown = 0.0;
 	bulletCooldown = 2.0;
 	bulletTime = 2.0;
-	lastPosCd = .5;
-	lastPos = { 0, 0, 0 };
 	stunned = 0.0;
 }
 
 Drone::Drone(float seconds) {
 	bulletCooldown = seconds;
 	bulletTime = seconds;
-	lastPosCd = .125;
-	lastPos = { 0, 0, 0 };
 	stunned = 0.0;
 }
 
@@ -190,102 +251,112 @@ Drone::~Drone() {};
 
 void Drone::update(float dt) {
 	bulletTime -= dt;
-	lastPosCd -= dt;
+	hitCooldown -= dt;
 	if (stunned > 0.0)
 		stunned -= dt;
-	if (lastPosCd <= 0) {
-		lastPos = getGlobalPosition();
-		lastPosCd = .125;
+	if (lastCollision > 0.0)
+		lastCollision -= dt;
+	if (healthPoints <= 0.0) {
+		//endgame
 	}
 }
 
 void Drone::shoot() {
-
 	if (bulletTime <= 0) {
-		BulletManager::getInstance()->createBullet(getGlobalPosition(),
-			(getGlobalMatrix() * Vector3(0, 0, 1) - getGlobalPosition()).normalize() * 400, id, 2, Vector3(0.0, 0.0, 1.0));
+		BulletManager::getInstance()->createBullet(getPosition(),
+			getGlobalMatrix().frontVector() * 600, id, 5.8, Vector3(0.0, 0.0, 1.0));
 		bulletTime = bulletCooldown;
 	}
 }
 
 void Drone::onBulletCollision() {
 	healthPoints -= 5;
+	hitCooldown = 0.1;
 }
 
-void Drone::onStaticCollision() {
+void Drone::onStaticCollision(Vector3 collisionPoint) {
+	std::cout << getPosition().x << " | " << getPosition().y << " | " << getPosition().z << std::endl;
 	healthPoints -= 5;
-	Vector3 dir = ((getPosition() * 1000000000.0) - (lastPos * 1000000000.0));
-	std::cout << -dir.x << ", " << -dir.y << ", " << -dir.z << std::endl;
+	Vector3 dir = getPosition() - collisionPoint;
 	dir.normalize();
-	dir = dir * 15;
-	model.traslateLocal(-dir.x, -dir.y, -dir.z);
-	std::cout << -dir.x << ", " << -dir.y << ", " << -dir.z << std::endl;
-	std::cout << "--------" << std::endl;
+	dir = dir * 32;
+	model.traslateLocal(dir.x, dir.y, dir.z);
+	std::cout << dir.x << " | " << dir.y << " | " << dir.z << "\n" << std::endl;
 }
 
 void Drone::onDynamicCollision(EntityCollider* colliderEntity) {
 	//agenjo "buscar física de particulas básica"
 	healthPoints -= 1;
-	Vector3 dir = (getGlobalPosition() - lastPos).normalize() * 200;
-	model.traslateLocal(-dir.x, -dir.y, -dir.z);
-	//Vector3 colliderFront = colliderEntity->getFront();
+	/*
+	Vector3 dir = (getPosition() - colliderEntity->getPosition()).normalize() * 25;
+	model.traslateLocal(dir.x, dir.y, dir.z);
+	*/
 }
 
 
 //Turret
 Turret::Turret() {
+	hitCooldown = 0.0;
 	bulletCooldown = 0.5;
 	bulletTime = 0.5;
 	healthPoints = 100;
-	detectionRange = 200;
+	maxRange = 1570;
+	minRange = 150;
 };
 
 Turret::Turret(float seconds) {
 	bulletCooldown = seconds;
 	bulletTime = seconds;
 	healthPoints = 100;
-	detectionRange = 200;
+	maxRange = 1570;
+	minRange = 150;
 };
 
 Turret::~Turret() {};
 
 void Turret::update(float dt) {
 	bulletTime -= dt;
+	hitCooldown -= dt;
 }
 
 
 void Turret::shoot() 
 {
+	Vector3 cannonShift = getPosition() + Vector3(0.0, 37.0, 0.0) + (getGlobalMatrix().frontVector() * 90);
 	if (bulletTime <= 0) {
-		BulletManager::getInstance()->createBullet(getPosition(),
-			(targetPosition - getPosition()).normalize() * 400, id, 2, Vector3(1.0, 0.0, 0.0));
+		BulletManager::getInstance()->createBullet(cannonShift,
+			(targetPosition - cannonShift).normalize() * 500, id, 5.8, Vector3(1.0, 0.0, 0.0));
 		bulletTime = bulletCooldown;
 	}
 }
 
-void Turret::onCollision() {
-
+void Turret::onBulletCollision() {
+	healthPoints -= 25;
+	hitCooldown = 0.1;
 }
 
 void Turret::onDynamicCollision(EntityCollider* colliderEntity) {
 	//agenjo "buscar física de particulas básica"
+	/*
 	healthPoints -= 2;
-	Vector3 front = getFront();
+	Vector3 front = getGlobalMatrix().topVector();
 	//La torreta no es mou del seu terra
 	model.traslate(-float(12) * front.x, 0.0, -float(12) * front.z);
 	//Vector3 colliderFront = colliderEntity->getFront();
+	*/
 }
 
-/*
-//Detector
-Detector::Detector() {};
-Detector::~Detector() {};
-void Detector::update(float dt) {
+void Turret::onDeath() {
+	auto it = std::find(dynamicColliders.begin(), dynamicColliders.end(), this);
+	if (it == dynamicColliders.end())
+	{
+		std::cout << "Error removing static collider " << this->name << std::endl;
+		return;
+	}
+	dynamicColliders.erase(it);
 
+	parent->removeChild(this);
+	delete this;
 }
-
-void Detector::onCollision() {
-
-} */
 
 #endif // !ENTITY_CPP

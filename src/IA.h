@@ -73,22 +73,4 @@ public:
 	void makeSound(); //Ja se que de moment no hem implementat so (just the dream)
 };
 
-
-/*
-Detector basico que busca enemigos y si los ve avisa a los otros bots
-*/
-/*
-class IA_Detector : public IA {
-public:
-IA_Detector();
-~IA_Detector();
-
-void update(double seconds_elapsed);
-bool scanEnemies();
-void warn();
-void makeSound(); //Ja se que de moment no hem implementat so (just the dream)
-
-}; */
-
-
 #endif // !IA_H

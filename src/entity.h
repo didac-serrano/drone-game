@@ -41,6 +41,7 @@ public:
 	Vector3 front;
 	
 	static Shader* default_shader;
+	Shader* hit_shader;
 	Shader* shader;
 
 	Entity* parent; //pointer to my parent entity 
@@ -59,9 +60,6 @@ public:
 	//some useful methods...
 	Matrix44 getGlobalMatrix(); //returns transform in world coordinates
 	Vector3 getPosition();
-	Vector3 getGlobalPosition();
-	Vector3 getFront();
-	Vector3 getTop();
 };
 
 
@@ -88,12 +86,13 @@ public:
 	static std::vector<EntityCollider*> dynamicColliders;
 	static std::vector<EntityCollider*> staticColliders;
 	float stunned;
+	float lastCollision;
 
 	EntityCollider();
 	~EntityCollider();
 
 	virtual void onBulletCollision();
-	virtual void onStaticCollision();
+	virtual void onStaticCollision(Vector3 collisionPoint);
 	virtual void onDynamicCollision(EntityCollider* colliderEntity);
 	void setDynamic();
 	void setStatic();
@@ -104,8 +103,10 @@ class EntityShooter : public EntityCollider
 public:
 	float bulletTime;
 	float bulletCooldown;
+	float hitCooldown;
 	int healthPoints;
-	int detectionRange;
+	int maxRange;
+	int minRange;
 	//Se utilitza a IA pero es un atribut independent de cada entitat
 	Vector3 targetPosition;
 
@@ -113,14 +114,13 @@ public:
 	~EntityShooter();
 	//virtual void shoot() = 0;
 
+	//methods overwriten 
+	void render(Camera* camera);
 };
 
 class Drone : public EntityShooter //Shooter
 {
-public: 
-	Vector3 lastPos;
-	int lastPosCd;
-
+public:
 	Drone();
 	Drone(float seconds);
 	~Drone();
@@ -128,8 +128,8 @@ public:
 	void update(float dt);
 	void shoot();
 	void onBulletCollision();
-	void onStaticCollision();
-	void onDynamicCollision(EntityCollider* colliderEntity); 
+	void onStaticCollision(Vector3 collisionPoint);
+	void onDynamicCollision(EntityCollider* colliderEntity);
 	//Hereda de EntityCollider, perd healthPoints o el que sigui
 };
 
@@ -142,19 +142,10 @@ public:
 
 	void update(float dt);
 	void shoot();
-	void onCollision();
+	void onBulletCollision();
 	void onDynamicCollision(EntityCollider* colliderEntity);
+	void onDeath();
 	//Hereda de EntityCollider, perd healthPoints o el que sigui
 };
 
-/*
-class Detector : public EntityCollider //Collider (no dispara)
-{
-public:
-	Detector();
-	~Detector();
-	void update(float dt);
-	void onCollision(); //Hereda de EntityCollider, perd healthPoints o el que sigui
-};
-*/
 #endif // !ENTITY_H

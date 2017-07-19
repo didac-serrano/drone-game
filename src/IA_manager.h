@@ -29,6 +29,8 @@ crear dos IAs una para cada "equipo".
 class IA_Manager {
 public:
 
+	static IA_Manager* myIAManager;
+	
 	IA_Manager();
 	~IA_Manager();
 
@@ -42,11 +44,13 @@ public:
 
 
 	//void addLockerEntity(IA_Locker* newLocker);
-	void addStaticEntity(IA_Turret* newDetector);
+	void addStaticEntity(IA_Turret* newTurret);
 	void addDynamicEntity(IA_Drone* newDrone);
+	void deleteStaticEntity(IA_Turret* turret);
 
 	void update(double seconds_elapsed);
 	void warnAll(Vector3 lastSeenEnemy);
+	static IA_Manager* getInstance();
 
 };
 

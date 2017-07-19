@@ -27,19 +27,29 @@ bool Level::loadLevel(Entity* root, PlayerController* controller, IA_Manager* mo
 	player->name = playerString;
 	player->meshName = playerString;
 	player->textureNames.push_back(playerString);
-	
+
 	t.seek("*SHADER");
 	std::string shaderName = t.getword();
 
 	if (shaderName != "DF") {
 		std::string vsShaderPath = "data/shaders/" + shaderName + ".vs";
 		std::string fsShaderPath = "data/shaders/" + shaderName + ".fs";
+		
 		player->shader = new Shader();
 		if (!player->shader->load(vsShaderPath.c_str(), fsShaderPath.c_str()))
 		{
 			std::cout << "Shader not found or error" << std::endl;
 			exit(0);
 		}
+	}
+
+	std::string vsShaderHitPath = "data/shaders/simple.vs";
+	std::string fsShaderHitPath = "data/shaders/IMHIT.fs";
+	player->hit_shader = new Shader();
+	if (!player->hit_shader->load(vsShaderHitPath.c_str(), fsShaderHitPath.c_str()))
+	{
+		std::cout << "Hit Ssader not found or error" << std::endl;
+		exit(0);
 	}
 
 	/*
@@ -104,6 +114,15 @@ bool Level::loadLevel(Entity* root, PlayerController* controller, IA_Manager* mo
 			}
 		}
 
+		std::string vsShaderHitPath = "data/shaders/simple.vs";
+		std::string fsShaderHitPath = "data/shaders/IMHIT.fs";
+		turret->hit_shader = new Shader();
+		if (!turret->hit_shader->load(vsShaderHitPath.c_str(), fsShaderHitPath.c_str()))
+		{
+			std::cout << "Hit shader not found or error" << std::endl;
+			exit(0);
+		}
+
 		t.seek("*TRASLATE");
 		Vector3* mapTranslate = new Vector3;
 		mapTranslate->x = t.getfloat();
@@ -130,6 +149,78 @@ bool Level::loadLevel(Entity* root, PlayerController* controller, IA_Manager* mo
 		root->addChild(turretEntities[i]);
 	}
 
+	//load RapidTurret
+	t.seek("*RAPID_TURRETS");
+	std::vector<Entity*> rapidEntities;
+	int numRapid = t.getint();
+	for (int i = 0; i < numRapid; i++)
+	{
+		t.seek("*RAPID_TURRET");
+		std::string turretString = t.getword();
+		Turret* turret = new Turret(0.09);
+		turret->name = turretString;
+		turret->meshName = turretString;
+
+		/*
+		t.seek("*N_TEXTURES");
+		int numTextures = t.getint();
+
+		for (int j = 0; j < numTextures; j++) {
+		t.seek("*TEXTURE");
+		std::string textureName = t.getword();
+		turret->textureNames.push_back(textureName);
+		}*/
+
+		turret->textureNames.push_back(turretString);
+
+		t.seek("*SHADER");
+		std::string shaderName = t.getword();
+
+		if (shaderName != "DF") { //ShaderManager
+			std::string vsShaderPath = "data/shaders/" + shaderName + ".vs";
+			std::string fsShaderPath = "data/shaders/" + shaderName + ".fs";
+			turret->shader = new Shader();
+			if (!turret->shader->load(vsShaderPath, fsShaderPath))
+			{
+				std::cout << "Shader not found or error" << std::endl;
+				exit(0);
+			}
+		}
+
+		std::string vsShaderHitPath = "data/shaders/simple.vs";
+		std::string fsShaderHitPath = "data/shaders/IMHIT.fs";
+		turret->hit_shader = new Shader();
+		if (!turret->hit_shader->load(vsShaderHitPath.c_str(), fsShaderHitPath.c_str()))
+		{
+			std::cout << "Hit shader not found or error" << std::endl;
+			exit(0);
+		}
+
+		t.seek("*TRASLATE");
+		Vector3* mapTranslate = new Vector3;
+		mapTranslate->x = t.getfloat();
+		mapTranslate->y = t.getfloat();
+		mapTranslate->z = t.getfloat();
+
+
+		Matrix44 modelTurret;
+		modelTurret.traslate(mapTranslate->x, mapTranslate->y, mapTranslate->z);
+		turret->model = modelTurret;
+
+		rapidEntities.push_back(turret);
+		turret->setDynamic();
+
+		IA_Turret* turretIA = new IA_Turret();
+		turretIA->controlledEntity = turret;
+		turretIA->target = player;
+
+		motherIA->addStaticEntity(turretIA);
+	}
+
+	for (int i = 0; i < numRapid; i++)
+	{
+		root->addChild(rapidEntities[i]);
+	}
 
 
 	//load Map Entities

@@ -38,16 +38,62 @@ void CheckCollisions::staticToDynamic(){
 			CollisionModel3D* second_collision_model = MeshManager::getMesh((secondEntity->meshName).c_str())->collisionBox;
 
 			first_collision_model->setTransform(firstEntity->getGlobalMatrix().m);
-
+	
 			if (first_collision_model->collision(second_collision_model, -1, 0, secondEntity->getGlobalMatrix().m) == false)
 				continue;
 
-			//std::cout << "Collision staticToDynamic" << std::endl;
+			if (secondEntity->lastCollision > 0.0)
+				continue;
 
-			//firstEntity->onCollision();
-			secondEntity->onStaticCollision();
+			Vector3 collisionPoint;
+			first_collision_model->getCollisionPoint(collisionPoint.v, true);
 			secondEntity->stunned = 1.0;
+			secondEntity->lastCollision = 0.2;
+			std::cout << collisionPoint.x << " | " << collisionPoint.y << " | " << collisionPoint.z << std::endl;
+			secondEntity->onStaticCollision(collisionPoint);
 
+			/*
+			float scope = 35;
+			//std::cout << "Collision staticToDynamic" << std::endl;
+			//secondEntity->stunned = 1.0;
+			
+			if (first_collision_model->rayCollision(secondEntity->getPosition().v, secondEntity->getGlobalMatrix().frontVector().v, true, 0.0, scope)) {
+				std::cout << "Front" << std::endl;
+				first_collision_model->getCollisionPoint(collisionPoint.v, true);
+				secondEntity->stunned = 1.0;
+				secondEntity->onStaticCollision(collisionPoint);
+			}
+			else if (first_collision_model->rayCollision(secondEntity->getPosition().v, (secondEntity->getGlobalMatrix().frontVector() * -1.0).v, true, 0.0, scope)) {
+				std::cout << "-Front" << std::endl;
+				first_collision_model->getCollisionPoint(collisionPoint.v, true);
+				secondEntity->stunned = 1.0;
+				secondEntity->onStaticCollision(collisionPoint);
+			}
+			else if (first_collision_model->rayCollision(secondEntity->getPosition().v, secondEntity->getGlobalMatrix().topVector().v, true, 0.0, 35)) {
+				std::cout << "Top" << std::endl;
+				first_collision_model->getCollisionPoint(collisionPoint.v, true);
+				secondEntity->stunned = 1.0;
+				secondEntity->onStaticCollision(collisionPoint);
+			}
+			else if (first_collision_model->rayCollision(secondEntity->getPosition().v, (secondEntity->getGlobalMatrix().topVector() * -1.0).v, true, 0.0, scope)) {
+				std::cout << "-Top" << std::endl;
+				first_collision_model->getCollisionPoint(collisionPoint.v, true);
+				secondEntity->stunned = 1.0;
+				secondEntity->onStaticCollision(collisionPoint);
+			}
+			else if (first_collision_model->rayCollision(secondEntity->getPosition().v, secondEntity->getGlobalMatrix().rightVector().v, true, 0.0, scope)) {
+				std::cout << "Right" << std::endl;
+				first_collision_model->getCollisionPoint(collisionPoint.v, true);
+				secondEntity->stunned = 1.0;
+				secondEntity->onStaticCollision(collisionPoint);
+			}
+			else if (first_collision_model->rayCollision(secondEntity->getPosition().v, (secondEntity->getGlobalMatrix().rightVector() * -1.0).v, true, 0.0, scope)) {
+				std::cout << "-Right" << std::endl;
+				first_collision_model->getCollisionPoint(collisionPoint.v, true);
+				secondEntity->stunned = 1.0;
+				secondEntity->onStaticCollision(collisionPoint);
+			}
+			*/
 		}
 	}
 }
