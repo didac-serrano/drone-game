@@ -82,6 +82,12 @@ void mainLoop()
 
 	while (1)
 	{
+		if (game->rip)
+			break;
+
+		if (game->win)
+			break;
+
 		//read keyboard state and stored in keystate
 		game->keystate = SDL_GetKeyboardState(NULL);
 
@@ -140,29 +146,32 @@ void mainLoop()
 
 int main(int argc, char **argv)
 {
-	std::cout << "Initiating game..." << std::endl;
+	//std::cout << "Initiating game..." << std::endl;
 
 	//prepare SDL
 	SDL_Init(SDL_INIT_EVERYTHING);
 
-	bool fullscreen = false; //change this to go fullscreen
+	bool fullscreen = true; //change this to go fullscreen
 	Vector2 size(800,600);
 
 	if(fullscreen)
 		size = getDesktopSize(0);
 
 	//create the game window (WINDOW_WIDTH and WINDOW_HEIGHT are two macros defined in includes.h)
-	SDL_Window* window = createWindow("TJE", (int)size.x, (int)size.y, fullscreen );
+	SDL_Window* window = createWindow("Inside job — 2017", (int)size.x, (int)size.y, fullscreen );
 	if (!window)
 		return 0;
 
-	//launch the game (game is a global variable)
-	game = new Game(window);
-	game->init();
+	while (1) {
+		//launch the menu
 
-	//main loop, application gets inside here till user closes it
-	mainLoop();
+		//launch the game (game is a global variable)
+		game = new Game(window);
+		game->init();
 
+		//main loop, application gets inside here till user closes it
+		mainLoop();
+	}
 	//save state and free memory
 	//...
 

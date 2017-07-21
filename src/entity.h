@@ -122,14 +122,20 @@ class Drone : public EntityShooter //Shooter
 {
 public:
 	Drone();
-	Drone(float seconds);
+	Drone(float seconds, int dmgOnHit);
 	~Drone();
 	
+	int dmgOnHit;
+	unsigned int additionalPackets;
+	unsigned int numBonus;
+	bool win;
+
 	void update(float dt);
 	void shoot();
 	void onBulletCollision();
 	void onStaticCollision(Vector3 collisionPoint);
 	void onDynamicCollision(EntityCollider* colliderEntity);
+	void onDeath();
 	//Hereda de EntityCollider, perd healthPoints o el que sigui
 };
 
@@ -143,9 +149,40 @@ public:
 	void update(float dt);
 	void shoot();
 	void onBulletCollision();
-	void onDynamicCollision(EntityCollider* colliderEntity);
 	void onDeath();
 	//Hereda de EntityCollider, perd healthPoints o el que sigui
+};
+
+class PowerUp : public EntityCollider
+{
+public:
+	PowerUp(int type);
+	~PowerUp();
+
+	int type;
+	Drone* playerEntity;
+
+	void update(float dt);
+	void onDynamicCollision(EntityCollider* colliderEntity);
+	void onCollection();
+	void onDeath();
+};
+
+class Packet : public EntityCollider
+{
+public:
+	Packet(unsigned int tipus);
+	~Packet();
+
+	unsigned int type;
+	int healthPoints;
+	float hitCooldown;
+	Drone* playerEntity;
+
+	void render(Camera* camera);
+	void update(float dt);
+	void onBulletCollision();
+	void onDeath();
 };
 
 #endif // !ENTITY_H

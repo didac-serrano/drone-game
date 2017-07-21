@@ -42,12 +42,12 @@ void PlayerController::update(double seconds_elapsed) {
 	}
 	//Z aka profunditat
 	if (keystate[SDL_SCANCODE_W] || keystate[SDL_SCANCODE_UP]) {
-		inercia = { 0, 0, float(speed * 0.8) };
+		//inercia = { 0, 0, float(speed * 0.8) };
 		playerEntity->model.traslateLocal(0, 0, float(speed * 0.8));
 		idle = FALSE;
 	}
 	if (keystate[SDL_SCANCODE_S] || keystate[SDL_SCANCODE_DOWN]) {
-		inercia = { 0, 0, float(-speed * 0.5) };
+		//inercia = { 0, 0, float(-speed * 0.5) };
 		playerEntity->model.traslateLocal(0, 0, float(-speed * 0.5));
 		idle = FALSE;
 	}
@@ -67,6 +67,12 @@ void PlayerController::update(double seconds_elapsed) {
 	//if (idle) playerEntity->model.traslateLocal(inercia.x, inercia.y, inercia.z);
 	if (keystate[SDL_SCANCODE_F]) playerEntity->shoot();
 	
+	if (playerEntity->healthPoints <= 0.0)
+		*rip = TRUE;
+
+	if (playerEntity->win)
+		*win = TRUE;
+
 	/*
 	if (myJoystick) {
 
@@ -97,4 +103,34 @@ void PlayerController::update(double seconds_elapsed) {
 		}
 	}
 	*/
+}
+
+void PlayerController::displayStatus() {
+
+	std::string health = "Healtpoints: " + std::to_string(playerEntity->healthPoints);
+	drawText(4, window_height - (window_height * 0.1), (health), Vector3(1, 1, 1), 2);
+	float distance = mainPac->getPosition().distance(playerEntity->getPosition()) / 127;
+	std::string quest = "[Destroy the main package] Distance: " + std::to_string(distance);
+	drawText(4, window_height - (window_height * 0.075), (quest), Vector3(1, 1, 1), 2);
+	std::string additional = "Optional packages destroyed: " + std::to_string(playerEntity->additionalPackets);
+	drawText(4, window_height - (window_height * 0.05), (additional), Vector3(1, 1, 1), 2);
+	std::string bonus = "Bonus collected: " + std::to_string(playerEntity->numBonus);
+	drawText(4, window_height - (window_height * 0.025), (bonus), Vector3(1, 1, 1), 2);
+
+
+}
+
+void PlayerController::displayCoords() {
+
+	std::string coordinates = std::to_string(playerEntity->getPosition().x) +
+		" " + std::to_string(playerEntity->getPosition().y) +
+		" " + std::to_string(playerEntity->getPosition().z);
+	drawText(4, 22, (coordinates), Vector3(1, 1, 1), 2);
+}
+
+void PlayerController::render() {
+	glDisable(GL_BLEND);
+	displayStatus();
+	//displayCoords();
+	glEnable(GL_BLEND);
 }

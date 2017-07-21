@@ -47,9 +47,16 @@ bool IA_Turret::scanEnemies()
 
 void IA_Turret::rotate(double seconds_elapsed)
 {
-	Vector3 direction = (target->getPosition() - controlledEntity->getPosition()).normalize();
-	Vector3 entityFront = controlledEntity->getGlobalMatrix().frontVector().normalize();
-	Vector3 entityRight = controlledEntity->getGlobalMatrix().rightVector().normalize();
+	Vector3 direction = (target->getPosition() - controlledEntity->getPosition());
+	Vector3 entityFront = controlledEntity->getGlobalMatrix().frontVector();
+	Vector3 entityRight = controlledEntity->getGlobalMatrix().rightVector();
+
+	direction.y = 0.0;
+	direction.normalize();
+	entityFront.y = 0.0;
+	direction.normalize();
+	entityRight.y = 0.0;
+	direction.normalize();
 
 	//Necessitem que no tingui en compte la diferencia d'alçada, ja que només rota en un pla
 	//Per això passem de les Y, sinó rota encara que estigui alineada amb el target (però en diferent alçada)
@@ -77,7 +84,7 @@ void IA_Turret::rotate(double seconds_elapsed)
 
 void IA_Turret::shootAtEnemies()
 {
-	if(angle < 0.1)
+	if(angle < 0.7)
 		controlledEntity->shoot();
 }
 
@@ -95,16 +102,83 @@ void IA_Turret::makeSound()
 	std::cout << "Piiiii" << std::endl;
 }
 
+
 //IA_Drone
 IA_Drone::IA_Drone() {}
 IA_Drone::~IA_Drone() {}
 
+bool IA_Drone::scanEnemies()
+{
+	if (target->getPosition().distance((controlledEntity->getPosition())) < 1100) return TRUE;
+	return FALSE;
+}
+
+void IA_Drone::rotate(double seconds_elapsed)
+{
+	Vector3 direction = (target->getPosition() - controlledEntity->getPosition());
+	Vector3 entityFront = controlledEntity->getGlobalMatrix().frontVector();
+	Vector3 entityRight = controlledEntity->getGlobalMatrix().rightVector();
+
+	direction.y = 0.0;
+	direction.normalize();
+	entityFront.y = 0.0;
+	direction.normalize();
+	entityRight.y = 0.0;
+	direction.normalize();
+
+	//Necessitem que no tingui en compte la diferencia d'alçada, ja que només rota en un pla
+	//Per això passem de les Y, sinó rota encara que estigui alineada amb el target (però en diferent alçada)
+	double dot = (direction.x * entityFront.x) + (direction.z * entityFront.z);
+	double dot_frontUp = (direction.x * entityRight.x) + (direction.z * entityRight.z);
+	angle = acos(dot);
+
+	//Es torreta aka enfocar en el pla xz rota sobre el seu eix Y
+	if (angle > 0.05)
+	{
+		if (dot_frontUp > 0.0) {
+			controlledEntity->model.rotateLocal(float(-seconds_elapsed * angle), controlledEntity->getGlobalMatrix().topVector());
+		}
+		else if (dot_frontUp < 0.0) {
+			controlledEntity->model.rotateLocal(float(seconds_elapsed * angle), controlledEntity->getGlobalMatrix().topVector());
+		}
+	}
+}
+
+void IA_Drone::altitude(double seconds_elapsed) {
+	if (abs(target->getPosition().y - controlledEntity->getPosition().y) > 17.0) {
+		if (target->getPosition().y > controlledEntity->getPosition().y)
+			controlledEntity->model.traslateLocal(0, float(seconds_elapsed * 350 * 0.4), 0);
+		else
+			controlledEntity->model.traslateLocal(0, float(-seconds_elapsed * 350 * 0.4), 0);
+	}
+}
+
+void IA_Drone::translate(double seconds_elapsed) {
+	if (controlledEntity->getPosition().distance(target->getPosition()) > 225.0 && angle < 0.8)
+	{
+		controlledEntity->model.traslateLocal(0, 0, float(seconds_elapsed * 350 * 0.8));
+	}
+}
+
 void IA_Drone::update(double seconds_elapsed) {
-	//Matrix44 myMatrix = controlledEntity->getGlobalMatrix();
-	//Mensaje de Agenjo: "Primero haced que esta entidad este mirando siempre hacia player,
-	// continuad a partir de ahi."
+
+	if (scanEnemies())
+	{
+		rotate(seconds_elapsed);
+		altitude(seconds_elapsed);
+		translate(seconds_elapsed);
+		controlledEntity->shoot();
+	}
+	if (controlledEntity->healthPoints <= 0.0) {
+		//parent de turret aka controlledEntity es root
+		controlledEntity->onDeath();
+		IA_Manager::getInstance()->deleteDynamicEntity(this);
+		delete this;
+	}
 
 }
+
+
 
 
 #endif // !IA_CPP

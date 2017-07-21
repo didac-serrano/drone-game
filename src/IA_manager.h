@@ -38,15 +38,13 @@ public:
 						  //SDL_Joystick* myJoystick;
 						  //Camera* camera;
 
-	//std::vector<IA_Locker*> lockerIAs;
 	std::vector<IA_Turret*> staticIAs;
 	std::vector<IA_Drone*> dynamicIAs;
 
-
-	//void addLockerEntity(IA_Locker* newLocker);
 	void addStaticEntity(IA_Turret* newTurret);
 	void addDynamicEntity(IA_Drone* newDrone);
 	void deleteStaticEntity(IA_Turret* turret);
+	void deleteDynamicEntity(IA_Drone* drone);
 
 	void update(double seconds_elapsed);
 	void warnAll(Vector3 lastSeenEnemy);

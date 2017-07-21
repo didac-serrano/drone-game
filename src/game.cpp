@@ -32,7 +32,7 @@ Game::Game(SDL_Window* window)
 	// Warning: DO NOT CREATE STUFF HERE, USE THE INIT 
 	// things created here cannot access opengl
 	SDL_GetWindowSize( window, &window_width, &window_height );
-	std::cout << " * Window size: " << window_width << " x " << window_height << std::endl;
+	//std::cout << " * Window size: " << window_width << " x " << window_height << std::endl;
 
 	fps = 0;
 	frame = 0;
@@ -47,7 +47,7 @@ Game::Game(SDL_Window* window)
 //Here we have already GL working, so we can create meshes and textures
 void Game::init(void)
 {
-    std::cout << " * Path: " << getPath() << std::endl;
+    //std::cout << " * Path: " << getPath() << std::endl;
     
     //SDL_SetWindowSize(window, 50, 50);
 
@@ -55,17 +55,24 @@ void Game::init(void)
 	glEnable( GL_CULL_FACE ); //render both sides of every triangle
 	glEnable( GL_DEPTH_TEST ); //check the occlusions using the Z buffer
 	
-	//Joystick - no es singleton per si toca fer multiplayer
+	rip = FALSE;
+	win = FALSE;
+
+	//Controller - no es singleton per si toca fer multiplayer
+	controller = new PlayerController();
+	/*
 	SDL_Joystick* myJoystick = NULL;
 	myJoystick = openJoystick(0);
-	controller = new PlayerController();
 	controller->myJoystick = myJoystick;
+	*/
 
 	//create our cameras
 	gameCamera = new Camera();
 	gameCamera->lookAt(Vector3(0.f, 525.f, 100.f), Vector3(0.f, 500.f, 0.f), Vector3(0.f, 1.f, 0.f)); //position the camera and point to 0,0,0
 	gameCamera->setPerspective(70.f, window_width / (float)window_height, 0.1f, 20000.f); //set the projection, we want to be perspective
 	controller->camera = gameCamera;
+	controller->rip = &rip;
+	controller->win = &win;
 	
 	freeCamera = new Camera();
 	freeCamera->lookAt(Vector3(0.f, 525.f, 100.f), Vector3(0.f, 500.f, 0.f), Vector3(0.f, 1.f, 0.f)); //position the camera and point to 0,0,0
@@ -79,12 +86,12 @@ void Game::init(void)
 	const char* levelFile = "level1.txt";
 	if (!level->loadLevel(root, controller, IA_Manager::getInstance(), levelFile))
 		std::cout << "Failed to load level" << levelFile << std::endl;
-
+	/*
 	cielo = new EntityMesh();
 	cielo->name = "cielo";
 	cielo->meshName = "cielo";
 	cielo->textureNames.push_back("cielo");
-
+	*/
 	/*
 	Menu* menu = new Menu();
 	menus.push_back(menu);
@@ -122,31 +129,27 @@ void Game::render(void)
 
 	//Draw out world
 	//drawGrid(500); //background grid
-	
+	/*
 	cielo->model.setTranslation(currentCamera->eye.x, currentCamera->eye.y, currentCamera->eye.z);
 
 	glDisable(GL_DEPTH_TEST);
 	cielo->render(currentCamera);
 	glEnable(GL_DEPTH_TEST);
+	*/
 	root->render(currentCamera);
 	
 	BulletManager::getInstance()->render(currentCamera);
-	/*else //render using fixed pipeline (DEPRECATED, use for debug only)
-	{
-		glPushMatrix();
-		m.multGL();
-		getMesh("p38")->render();
-		glPopMatrix();
-	}*/
     
     glDisable( GL_BLEND );
-
 	//example to render the FPS every 10 frames
-	drawText(2, 2, std::to_string(fps), Vector3(1, 1, 1), 2 );
-	std::string coordinates = std::to_string(root->children[0]->getPosition().x) + 
-		" " + std::to_string(root->children[0]->getPosition().y) + 
-		" " + std::to_string(root->children[0]->getPosition().z);
-	drawText(2, 22, (coordinates), Vector3(1, 1, 1), 2);
+	drawText(4, 2, std::to_string(fps), Vector3(1, 1, 1), 2);
+	glEnable(GL_DEPTH_TEST);
+	
+
+	//healthbar
+	controller->render();
+	controller->window_width = window_width;
+	controller->window_height = window_height;
 
 	//swap between front buffer and back buffer
 	SDL_GL_SwapWindow(this->window);
@@ -157,6 +160,7 @@ void Game::update(double seconds_elapsed)
 
 	float speed = seconds_elapsed * 600; //the speed is defined by the seconds_elapsed so it goes constant
 
+	#ifdef _DEBUG
 	if (cameraMode) {
 		if ((mouse_state & SDL_BUTTON_LEFT) || mouse_locked) //is left button pressed?
 		{
@@ -183,16 +187,24 @@ void Game::update(double seconds_elapsed)
 			this->mouse_position.x = (float)center_x;
 			this->mouse_position.y = (float)center_y;
 		}
-	}
 
-	else {
+	} else {
 		BulletManager::getInstance()->update(seconds_elapsed);
 		CheckCollisions::getInstance()->checkAll();
 		root->update(seconds_elapsed);
 		controller->update(seconds_elapsed);
 		IA_Manager::getInstance()->update(seconds_elapsed);
-	}
 
+		angle += (float)seconds_elapsed * 10.0f;
+		return;
+	}
+	#endif
+
+	BulletManager::getInstance()->update(seconds_elapsed);
+	CheckCollisions::getInstance()->checkAll();
+	root->update(seconds_elapsed);
+	controller->update(seconds_elapsed);
+	IA_Manager::getInstance()->update(seconds_elapsed);
 	
 	angle += (float)seconds_elapsed * 10.0f;
 }
@@ -224,7 +236,7 @@ void Game::onMouseButton( SDL_MouseButtonEvent event )
 
 void Game::setWindowSize(int width, int height)
 {
-    std::cout << "window resized: " << width << "," << height << std::endl;
+    //std::cout << "window resized: " << width << "," << height << std::endl;
     
 	/*
     Uint32 flags = SDL_GetWindowFlags(window);

@@ -112,7 +112,6 @@
     <ClCompile Include="..\..\src\texture.cpp" />
     <ClCompile Include="..\..\src\texturemanager.cpp" />
     <ClCompile Include="..\..\src\utils.cpp" />
-    <ClCompile Include="..\..\src\menu.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\bulletmanager.h" />
@@ -140,7 +139,6 @@
     <ClInclude Include="..\..\src\texture.h" />
     <ClInclude Include="..\..\src\texturemanager.h" />
     <ClInclude Include="..\..\src\utils.h" />
-    <ClCompile Include="..\..\src\menu.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>

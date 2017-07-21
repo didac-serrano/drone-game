@@ -29,6 +29,10 @@ public:
 	float elapsed_time;
 	int fps;
 
+	//endgame
+	bool rip;
+	bool win;
+
 	//keyboard state
 	static const Uint8* keystate;
 

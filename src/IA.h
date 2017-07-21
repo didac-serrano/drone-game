@@ -40,19 +40,6 @@ public:
 
 };
 
-// DYNAMIC IAs (en nuestro caso los drones enemigos, se desplazan por el mapa)
-class IA_Drone : public IA {
-public:
-	
-	IA_Drone();
-	~IA_Drone();
-
-	Drone* controlledEntity;
-	void update(double seconds_elapsed);
-
-};
-
-
 /*
 Torreta que busca enemigos y si los ve avisa a los otros bots y además les dispara.
 Por defecto, su rango de deteccion es menor que el del detecor
@@ -71,6 +58,24 @@ public:
 
 	void warn();
 	void makeSound(); //Ja se que de moment no hem implementat so (just the dream)
+};
+
+// DYNAMIC IAs (en nuestro caso los drones enemigos, se desplazan por el mapa)
+class IA_Drone : public IA {
+public:
+
+	IA_Drone();
+	~IA_Drone();
+
+	Drone* controlledEntity;
+	void update(double seconds_elapsed);
+	
+	bool scanEnemies();
+	void rotate(double seconds_elapsed);
+	void altitude(double seconds_elapsed);
+	void translate(double seconds_elapsed);
+
+
 };
 
 #endif // !IA_H

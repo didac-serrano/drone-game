@@ -47,9 +47,11 @@ void CheckCollisions::staticToDynamic(){
 
 			Vector3 collisionPoint;
 			first_collision_model->getCollisionPoint(collisionPoint.v, true);
-			secondEntity->stunned = 1.0;
+			secondEntity->stunned = 0.3;
 			secondEntity->lastCollision = 0.2;
-			std::cout << collisionPoint.x << " | " << collisionPoint.y << " | " << collisionPoint.z << std::endl;
+			#ifdef _DEBUG
+				std::cout << collisionPoint.x << " | " << collisionPoint.y << " | " << collisionPoint.z << std::endl;
+			#endif
 			secondEntity->onStaticCollision(collisionPoint);
 
 			/*
@@ -120,11 +122,8 @@ void CheckCollisions::dynamicToDynamic() {
 			if (first_collision_model->collision(second_collision_model, -1, 0, secondEntity->getGlobalMatrix().m) == false)
 				continue;
 
-			//std::cout << "Collision dynamicToDynamic" << std::endl;
-
 			firstEntity->onDynamicCollision(secondEntity);
 			secondEntity->onDynamicCollision(firstEntity);
-
 		}
 	}
 }
@@ -138,7 +137,6 @@ void CheckCollisions::bulletToStatic() {
 		CollisionModel3D* collision_model = MeshManager::getMesh((actualEntity->meshName).c_str())->collisionModel;
 
 		collision_model->setTransform(actualEntity->getGlobalMatrix().m);
-		//std::cout << actualEntity->meshName << std::endl;
 
 		for (int j = 0; j < NUMBULLETS; j++) {
 			Bullet& bullet = manager->bullets[j];
@@ -151,31 +149,7 @@ void CheckCollisions::bulletToStatic() {
 			if (collision_model->rayCollision(start.v, front.v, true, 0.0, 10.0) == false)
 				continue;
 
-			//std::cout << "Collision bulletToStatic" << std::endl;
-
-			bullet.ttl = 0.0001;
-			//De moment no hi ha cap entitat estàtica matable
-			//actualEntity->onCollision();
-			
-			//std::cout << "Colision" << std::endl;
-			
-			/* //Collision test OK it works
-			Vector3 collision;
-			collision_model->getCollisionPoint(collision.v, false);
-			
-			std::string playerString = "p38";
-			EntityMesh* player = new EntityMesh();
-			player->name = playerString;
-			player->meshName = playerString;
-			player->textureName = playerString;
-
-			Matrix44 modelPlayer;
-			modelPlayer.traslate(collision.x, collision.y, collision.z);
-			player->model = modelPlayer;
-
-			actualEntity->addChild(player);
-			*/
-						
+			bullet.ttl = 0.0001;	
 		}
 	}
 }
@@ -203,11 +177,8 @@ void CheckCollisions::bulletToDynamic() {
 			if (collision_model->rayCollision(start.v, front.v, true, 0.0, 10.0) == false)
 				continue;
 
-			//std::cout << "Collision bulletToDynamic" << std::endl;
-
 			bullet.ttl = 0.0001;
 			actualEntity->onBulletCollision();
-		
 		}
 	}
 }

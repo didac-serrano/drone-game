@@ -16,8 +16,6 @@
     <ClCompile Include="..\..\src\texture.cpp" />
     <ClCompile Include="..\..\src\texturemanager.cpp" />
     <ClCompile Include="..\..\src\utils.cpp" />
-    <ClCompile Include="..\..\src\menu.cpp" />
-    <ClCompile Include="..\..\src\menu.h" />
     <ClCompile Include="..\..\src\extra\coldet\box.cpp">
       <Filter>Coldet</Filter>
     </ClCompile>
@@ -45,6 +43,7 @@
     <ClCompile Include="..\..\src\bulletmanager.cpp" />
     <ClCompile Include="..\..\src\checkcollisions.cpp" />
     <ClCompile Include="..\..\src\IA.cpp" />
+    <ClCompile Include="..\..\src\IA_manager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\..\src\camera.h" />
@@ -84,6 +83,7 @@
     <ClInclude Include="..\..\src\bulletmanager.h" />
     <ClInclude Include="..\..\src\checkcollisions.h" />
     <ClInclude Include="..\..\src\IA.h" />
+    <ClInclude Include="..\..\src\IA_manager.h" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="visualstudio.rc" />

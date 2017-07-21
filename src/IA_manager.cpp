@@ -33,24 +33,29 @@ void IA_Manager::deleteStaticEntity(IA_Turret* turret)
 	staticIAs.erase(it);
 }
 
+void IA_Manager::deleteDynamicEntity(IA_Drone* drone)
+{
+	auto it = std::find(dynamicIAs.begin(), dynamicIAs.end(), drone);
+	if (it == dynamicIAs.end())
+	{
+		std::cout << "Some real bad happened" << std::endl;
+		return;
+	}
+	dynamicIAs.erase(it);
+}
+
 
 void IA_Manager::update(double seconds_elapsed)
 {
-	/*
-	for (int i = 0; i < size(lockerIAs); i++)
-	{
-		lockerIAs[i]->update(seconds_elapsed);
-	}*/
-
 	for (int i = 0; i < size(staticIAs); i++)
 	{
 		staticIAs[i]->update(seconds_elapsed);
 	}
-	/*
+
 	for (int i = 0; i < size(dynamicIAs); i++)
 	{
 		dynamicIAs[i]->update(seconds_elapsed);
-	}*/
+	}
 }
 
 void IA_Manager::warnAll(Vector3 lastSeenEnemy)

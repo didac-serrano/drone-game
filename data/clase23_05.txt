@@ -1,8 +1,0 @@
-glDisable GL_CULL_FACE
-"" DEPTH TEST
-
-ENABLE BLEND
-glblendfunc SRC ALPHA, ONEMINUSSRCALPHA
-
-Camera cam
-cam.setorthographic
